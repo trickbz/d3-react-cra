@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
 import BarChart from './BarChart';
-import AnimatedFauxComponent from './animated-faux-component';
 
 const books = [
     {title: 'Book 1', orders: 12},

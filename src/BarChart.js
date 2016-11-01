@@ -46,13 +46,23 @@ const BarChart = React.createClass({
             .data(data)
             .enter().append('rect')
             .attr('height', 0)
+            .attr('opacity', 0.1)
             .attr('class', 'bar')
             .attr('x', d => x(d[xKey]))
             .attr('width', x.bandwidth())
-            .attr('y', d => y(d[yKey]))
-            .attr('height', d => height - y(d[yKey]))
-            .append('title')
+            .attr('y', d => y(0))
+            .attr('height', d => height - y(1)) ;
+
+        rect.append('title')
             .text(d => `${d[xKey]}: ${d[yKey]}`);
+
+        rect.transition()
+            .duration(1000)
+            .attr('opacity', 1)
+            .attr('height', d => height - y(d[yKey]))
+            .attr('y', d => y(d[yKey]));
+
+        component.animateFauxDOM(1000);
 
         svg.append('g')
             .attr('transform', `translate(0, ${height})`)
