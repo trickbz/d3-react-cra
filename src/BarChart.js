@@ -3,9 +3,15 @@ import * as d3 from 'd3';
 import ReactFauxDom from 'react-faux-dom';
 import css from './bar-chart.css';
 
-class BarChart extends React.Component {
-    render() {
-
+const BarChart = React.createClass({
+    mixins: [
+        ReactFauxDom.mixins.core,
+        ReactFauxDom.mixins.anim
+    ],
+    getInitialState() {
+        return {};
+    },
+    componentDidMount() {
         const xKey = this.props.config.xKey;
         const yKey = this.props.config.yKey;
         const data = this.props.config.data;
@@ -15,9 +21,12 @@ class BarChart extends React.Component {
         const margin = {top: 20, right: 20, bottom: 50, left: 50},
             width = this.props.width - margin.left - margin.right,
             height = this.props.height - margin.top - margin.bottom;
-        const root = new ReactFauxDom.Element('div');
 
-        const svg = d3.select(root)
+        const root = new ReactFauxDom.Element('div');
+        const faux = this.connectFauxDOM(root, 'chart');
+        const component = this;
+
+        const svg = d3.select(faux)
             .append('svg')
             .attr('width', width + margin.left + margin.right)
             .attr('height', height + margin.top + margin.bottom)
@@ -33,9 +42,10 @@ class BarChart extends React.Component {
             .domain([0, d3.max(data, d => d[yKey])])
             .range([height, 0]);
 
-        svg.selectAll('rect')
+        let rect = svg.selectAll('rect')
             .data(data)
             .enter().append('rect')
+            .attr('height', 0)
             .attr('class', 'bar')
             .attr('x', d => x(d[xKey]))
             .attr('width', x.bandwidth())
@@ -63,9 +73,13 @@ class BarChart extends React.Component {
             .attr('dy', '1em')
             .attr('text-anchor', 'middle')
             .text(yAxisLabel);
-
-        return root.toReact();
+    },
+    render() {
+        return (
+            <div>
+                {this.state.chart}
+            </div>)
     }
-}
+});
 
 export default BarChart;

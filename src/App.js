@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import BarChart from './BarChart';
-import FauxAnimationSandbox from './FauxAnimationSandbox';
+import AnimatedFauxComponent from './animated-faux-component';
 
 const books = [
     {title: 'Book 1', orders: 12},
@@ -44,7 +44,6 @@ class App extends Component {
             width={400}
             height={300}
             config={configAuthors} />
-        <FauxAnimationSandbox />
       </div>
     );
   }
