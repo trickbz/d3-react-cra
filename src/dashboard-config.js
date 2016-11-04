@@ -1,20 +1,20 @@
 const books = [
-    {title: 'Book 1', orders: 12},
+    {title: 'This is very long book name', orders: 12},
     {title: 'Book 2', orders: 5},
     {title: 'Book 3', orders: 21},
-    {title: 'Book 4', orders: 61},
+    {title: 'Don\'t be so long, dear book name. I have you!', orders: 61},
     {title: 'Book 5', orders: 30}
 ];
 
 const authors = [
     {author: 'Author 1', books: 11},
-    {author: 'Author 2', books: 5},
+    {author: 'This time the name become XXX chars length. Good or not? Good!', books: 5},
     {author: 'Author 3', books: 21},
     {author: 'Author 4', books: 7},
     {author: 'Author 5', books: 3},
-    {author: 'Author 6', books: 4},
+    {author: 'The most FAT programmer in the world! ', books: 4},
     {author: 'Author 7', books: 31},
-    {author: 'Author 8', books: 20}
+    {author: 'Mama mila ramu i papu', books: 20}
 ];
 
 const configBooks = {

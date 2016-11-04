@@ -28,7 +28,7 @@ class Dashboard extends React.Component {
                 />
                 <BarChart
                     width={400}
-                    height={300}
+                    height={400}
                     config={this.state.currentConfig}
                 />
             </div>

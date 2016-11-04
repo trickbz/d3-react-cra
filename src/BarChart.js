@@ -19,7 +19,7 @@ const BarChart = React.createClass({
     },
     getDataFromConfig(config) {
         const {xKey, yKey, data, xAxisLabel, yAxisLabel} = config;
-        const margin = {top: 20, right: 20, bottom: 50, left: 50},
+        const margin = {top: 30, right: 20, bottom: 100, left: 50},
             width = this.props.width - margin.left - margin.right,
             height = this.props.height - margin.top - margin.bottom;
 
@@ -74,7 +74,7 @@ const BarChart = React.createClass({
             .attr('height', d => barData.height - barData.yScale(0)) // 0 value for transition
             .attr('fill', () => barData.color(Math.random()));
 
-        // tooltip
+        // tooltip TODO: tooltip is not updated
         rect.append('title')
             .text(d => `${d[barData.xKey]}: ${d[barData.yKey]}`);
 
@@ -85,15 +85,25 @@ const BarChart = React.createClass({
             .attr('y', d => barData.yScale(d[barData.yKey]));
 
         // x axis
-        svg.append('g')
+        const xAxis = svg.append('g')
             .attr('class', 'axis x-axis')
             .attr('transform', `translate(0, ${barData.height})`)
-            .call(d3.axisBottom(barData.xScale));
+            .call(d3.axisBottom(barData.xScale).tickFormat(d => (d.length > 20 ? d.substr(0, 20) + '…': d)));
+
+        // rotate x-axis tick labels
+        xAxis.selectAll('text')
+            .attr('x', 0)
+            .attr('y', 0)
+            .attr('dy', '1em')
+            .attr('dx', '-1em')
+            .attr('transform', 'rotate(-45)')
+            .style('text-anchor', 'end');
 
         // x axis label
         svg.append('text')
             .attr('class', 'axis-label x-axis-label')
-            .attr('transform', `translate(${barData.width / 2}, ${barData.height + barData.margin.top + 20})`)
+            .attr('transform', `translate(${barData.width / 2}, ${0})`)
+            .attr('dy', '-.5em')
             .style('text-anchor', 'middle')
             .text(barData.xAxisLabel);
 
@@ -108,7 +118,7 @@ const BarChart = React.createClass({
             .attr('transform', 'rotate(-90)')
             .attr('x', 0 - (barData.height / 2))
             .attr('y', 10 - barData.margin.left)
-            .attr('dy', '1em')
+            .attr('dy', '.75em')
             .attr('text-anchor', 'middle')
             .text(barData.yAxisLabel);
 
@@ -128,11 +138,20 @@ const BarChart = React.createClass({
             .attr('fill', () => barData.color(Math.random()));
 
         // x-axis update
-        d3.select('.x-axis')
-            // TODO: Error if try to animate x-axis
-            // .transition()
-            // .duration(duration)
-            .call(d3.axisBottom(barData.xScale));
+        const xAxis = d3.select('.x-axis')
+        // TODO: Error if try to animate x-axis
+        // .transition()
+        // .duration(duration)
+            .call(d3.axisBottom(barData.xScale).tickFormat(d => (d.length > 20 ? d.substr(0, 20) + '…': d)));
+
+        // rotate x-axis tick labels
+        xAxis.selectAll('text')
+            .attr('x', 0)
+            .attr('y', 0)
+            .attr('dy', '1em')
+            .attr('dx', '-1em')
+            .attr('transform', 'rotate(-45)')
+            .style('text-anchor', 'end');
 
         d3.select('.x-axis-label')
             .attr('opacity', 0)
@@ -143,9 +162,9 @@ const BarChart = React.createClass({
 
         // y-axis update
         d3.select('.y-axis')
-            // TODO: Error if try to animate y-axis
-            // .transition()
-            // .duration(duration)
+        // TODO: Error if try to animate y-axis
+        // .transition()
+        // .duration(duration)
             .call(d3.axisLeft(barData.yScale));
 
         d3.select('.y-axis-label')
