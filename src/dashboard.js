@@ -4,7 +4,7 @@ import BarChart from './BarChart';
 import config from './dashboard-config';
 
 class Dashboard extends React.Component {
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
             currentConfig: config[0],
@@ -14,22 +14,22 @@ class Dashboard extends React.Component {
     }
 
     barChartSourceChanged(config) {
-      this.setState({
-        currentConfig: config
-      });
+        this.setState({
+            currentConfig: config
+        });
     }
 
     render() {
         return (
             <div>
                 <DashboardMenu
-                  barChartSourceChanged={this.barChartSourceChanged}
-                  data={config}
+                    barChartSourceChanged={this.barChartSourceChanged}
+                    data={config}
                 />
                 <BarChart
-                  width={400}
-                  height={300}
-                  config={this.state.currentConfig}
+                    width={400}
+                    height={300}
+                    config={this.state.currentConfig}
                 />
             </div>
         )
