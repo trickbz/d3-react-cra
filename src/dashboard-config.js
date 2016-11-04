@@ -3,7 +3,7 @@ const books = [
     {title: 'Book 2', orders: 5},
     {title: 'Book 3', orders: 21},
     {title: 'Book 4', orders: 61},
-    {title: 'Book 5', orders: 30},
+    {title: 'Book 5', orders: 30}
 ];
 
 const authors = [
@@ -12,7 +12,9 @@ const authors = [
     {author: 'Author 3', books: 21},
     {author: 'Author 4', books: 7},
     {author: 'Author 5', books: 3},
-    {author: 'Author 5', books: 3},
+    {author: 'Author 6', books: 4},
+    {author: 'Author 7', books: 31},
+    {author: 'Author 8', books: 20}
 ];
 
 const configBooks = {

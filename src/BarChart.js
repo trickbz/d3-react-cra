@@ -32,6 +32,9 @@ const BarChart = React.createClass({
             .domain([0, d3.max(data, d => d[yKey])])
             .range([height, 0]);
 
+        // bar colors
+        const color = d3.interpolateRgb('green', 'orange');
+
         return {
             xKey,
             yKey,
@@ -42,7 +45,8 @@ const BarChart = React.createClass({
             width,
             height,
             xScale,
-            yScale
+            yScale,
+            color
         }
     },
     generateInitialMarkup(config) {
@@ -67,7 +71,8 @@ const BarChart = React.createClass({
             .attr('x', d => barData.xScale(d[barData.xKey]))
             .attr('width', barData.xScale.bandwidth())
             .attr('y', d => barData.yScale(0)) // 0 value for transition
-            .attr('height', d => barData.height - barData.yScale(0)); // 0 value for transition
+            .attr('height', d => barData.height - barData.yScale(0)) // 0 value for transition
+            .attr('fill', () => barData.color(Math.random()));
 
         // tooltip
         rect.append('title')
@@ -119,12 +124,14 @@ const BarChart = React.createClass({
             .transition()
             .duration(duration)
             .attr('height', d => barData.height - barData.yScale(d[barData.yKey]))
-            .attr('y', d => barData.yScale(d[barData.yKey]));
+            .attr('y', d => barData.yScale(d[barData.yKey]))
+            .attr('fill', () => barData.color(Math.random()));
 
         // x-axis update
         d3.select('.x-axis')
-            .transition()
-            .duration(duration)
+            // TODO: Error if try to animate x-axis
+            // .transition()
+            // .duration(duration)
             .call(d3.axisBottom(barData.xScale));
 
         d3.select('.x-axis-label')
@@ -136,8 +143,9 @@ const BarChart = React.createClass({
 
         // y-axis update
         d3.select('.y-axis')
-            .transition()
-            .duration(duration)
+            // TODO: Error if try to animate y-axis
+            // .transition()
+            // .duration(duration)
             .call(d3.axisLeft(barData.yScale));
 
         d3.select('.y-axis-label')
