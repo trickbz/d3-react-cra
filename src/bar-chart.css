@@ -5,3 +5,10 @@ svg {
 .axis-label {
     font-weight: bold;
 }
+
+.bar-chart-tooltip {
+    border: 1px solid black;
+    border-radius: 3px;
+    padding: 3px;
+    background-color: white;
+}

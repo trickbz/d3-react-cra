@@ -43,6 +43,14 @@ const BarChart = React.createClass({
             .attr('dy', '.75em')
             .attr('text-anchor', 'middle');
 
+        d3.select("body")
+            .append("div")
+            .attr('class', 'bar-chart-tooltip')
+            .style("position", "absolute")
+            .style("z-index", "10")
+            .style("visibility", "hidden")
+            .text("a simple tooltip");
+
         return svg;
     },
     componentDidMount() {
@@ -98,6 +106,7 @@ const BarChart = React.createClass({
             .transition()
             .duration(duration)
             .style('opacity', 0)
+            .attr('height', 0)
             .remove();
 
         bars
@@ -125,6 +134,15 @@ const BarChart = React.createClass({
             .attr('height', d => barData.height - barData.yScale(d[barData.yKey]))
             .attr('y', d => barData.yScale(d[barData.yKey]))
             .style('opacity', 1);
+
+        const tooltip = d3.select('.bar-chart-tooltip');
+        svg.selectAll('.bar')
+            .on("mouseover", d => tooltip.style("visibility", "visible").text(d[barData.yKey]))
+            .on("mousemove", d => {
+                tooltip.style("top",
+                    (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px").text(d[barData.yKey])
+            })
+            .on("mouseout", () => tooltip.style("visibility", "hidden"));
 
         // x axis
         const xAxis = svg.select('.x-axis')
