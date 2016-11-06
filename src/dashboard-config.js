@@ -1,5 +1,5 @@
 const books = [
-    {title: 'This is very long book name', orders: 12},
+    {title: 'This is very long book name', orders: 66},
     {title: 'Book 2', orders: 5},
     {title: 'Book 3', orders: 21},
     {title: 'Don\'t be so long, dear book name. I have you!', orders: 61},

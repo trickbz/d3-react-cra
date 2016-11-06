@@ -11,11 +11,47 @@ const BarChart = React.createClass({
     getInitialState() {
         return {};
     },
-    componentDidMount() {
-        this.generateInitialMarkup(this.props.config);
+    createSvg() {
+        var barData = this.getDataFromConfig(this.props.config);
+        const root = new ReactFauxDom.Element('div');
+        const faux = this.connectFauxDOM(root, 'chart');
+        const svg = d3.select(faux)
+            .append('svg')
+            .attr('width', barData.width + barData.margin.left + barData.margin.right)
+            .attr('height', barData.height + barData.margin.top + barData.margin.bottom)
+            .append('g')
+            .attr("transform", `translate(${barData.margin.left}, ${barData.margin.top})`);
+
+        svg.append('g')
+            .attr('class', 'axis x-axis')
+            .attr('transform', `translate(0, ${barData.height})`);
+
+        svg.append('g')
+            .attr('class', 'axis y-axis');
+
+        svg.append('text')
+            .attr('class', 'axis-label x-axis-label')
+            .attr('transform', `translate(${barData.width / 2}, ${0})`)
+            .attr('dy', '-.5em')
+            .style('text-anchor', 'middle');
+
+        svg.append('text')
+            .attr('class', 'axis-label y-axis-label')
+            .attr('transform', 'rotate(-90)')
+            .attr('x', 0 - (barData.height / 2))
+            .attr('y', 10 - barData.margin.left)
+            .attr('dy', '.75em')
+            .attr('text-anchor', 'middle');
+
+        return svg;
     },
-    componentWillReceiveProps(nextProps) {
-        this.updateMarkup(nextProps.config);
+    componentDidMount() {
+        const svg = this.createSvg();
+        this.componentWillReceiveProps = this.componentWillReceiveProps.bind(this, svg);
+        this.update(this.props.config, svg);
+    },
+    componentWillReceiveProps(svg, nextProps) {
+        this.update(nextProps.config, svg);
     },
     getDataFromConfig(config) {
         const {xKey, yKey, data, xAxisLabel, yAxisLabel} = config;
@@ -49,45 +85,49 @@ const BarChart = React.createClass({
             color
         }
     },
-    generateInitialMarkup(config) {
+    update(config, svg) {
         var barData = this.getDataFromConfig(config);
-        const root = new ReactFauxDom.Element('div');
-        const faux = this.connectFauxDOM(root, 'chart');
+        const duration = 1000;
 
-        // svg
-        const svg = d3.select(faux)
-            .append('svg')
-            .attr('width', barData.width + barData.margin.left + barData.margin.right)
-            .attr('height', barData.height + barData.margin.top + barData.margin.bottom)
-            .append('g')
-            .attr("transform", `translate(${barData.margin.left}, ${barData.margin.top})`);
+        const bars = svg.selectAll('rect')
+            .data(barData.data);
 
-        // bar
-        let rect = svg.selectAll('rect')
-            .data(barData.data)
-            .enter().append('rect')
-            .attr('height', 0) // 0 value for transition
-            .attr('class', 'bar')
+        bars
+            .exit()
+            .style('opacity', 1)
+            .transition()
+            .duration(duration)
+            .style('opacity', 0)
+            .remove();
+
+        bars
+            .transition()
+            .duration(duration)
             .attr('x', d => barData.xScale(d[barData.xKey]))
             .attr('width', barData.xScale.bandwidth())
-            .attr('y', d => barData.yScale(0)) // 0 value for transition
-            .attr('height', d => barData.height - barData.yScale(0)) // 0 value for transition
+            .attr('height', d => barData.height - barData.yScale(d[barData.yKey]))
+            .attr('y', d => barData.yScale(d[barData.yKey]))
             .attr('fill', () => barData.color(Math.random()));
 
-        // tooltip TODO: tooltip is not updated
-        rect.append('title')
-            .text(d => `${d[barData.xKey]}: ${d[barData.yKey]}`);
-
-        // bar transition from 0 to action values
-        rect.transition()
-            .duration(1000)
+        bars
+            .enter()
+            .append('rect')
+            .attr('class', 'bar')
+            .attr('fill', 'red')
+            .attr('x', d => barData.xScale(d[barData.xKey]))
+            .attr('y', d => barData.yScale(0))
+            .attr('width', barData.xScale.bandwidth())
+            .attr('height', barData.height - barData.yScale(0))
+            .attr('fill', () => barData.color(Math.random()))
+            .style('opacity', 0)
+            .transition()
+            .duration(duration)
             .attr('height', d => barData.height - barData.yScale(d[barData.yKey]))
-            .attr('y', d => barData.yScale(d[barData.yKey]));
+            .attr('y', d => barData.yScale(d[barData.yKey]))
+            .style('opacity', 1);
 
         // x axis
-        const xAxis = svg.append('g')
-            .attr('class', 'axis x-axis')
-            .attr('transform', `translate(0, ${barData.height})`)
+        const xAxis = svg.select('.x-axis')
             .call(d3.axisBottom(barData.xScale).tickFormat(d => (d.length > 20 ? d.substr(0, 20) + '…': d)));
 
         // rotate x-axis tick labels
@@ -100,79 +140,18 @@ const BarChart = React.createClass({
             .style('text-anchor', 'end');
 
         // x axis label
-        svg.append('text')
-            .attr('class', 'axis-label x-axis-label')
-            .attr('transform', `translate(${barData.width / 2}, ${0})`)
-            .attr('dy', '-.5em')
-            .style('text-anchor', 'middle')
+        svg.select('.x-axis-label')
             .text(barData.xAxisLabel);
 
         // y axis
-        svg.append('g')
-            .attr('class', 'axis y-axis')
+        svg.select('.y-axis')
             .call(d3.axisLeft(barData.yScale));
 
         // y axis label
-        svg.append('text')
-            .attr('class', 'axis-label y-axis-label')
-            .attr('transform', 'rotate(-90)')
-            .attr('x', 0 - (barData.height / 2))
-            .attr('y', 10 - barData.margin.left)
-            .attr('dy', '.75em')
-            .attr('text-anchor', 'middle')
+        svg.select('.y-axis-label')
             .text(barData.yAxisLabel);
 
         this.animateFauxDOM(1000);
-    },
-    updateMarkup(config) {
-        const duration = 1000;
-        const barData = this.getDataFromConfig(config);
-
-        // perform bar transition from previous values to new values
-        d3.selectAll('.bar')
-            .data(barData.data)
-            .transition()
-            .duration(duration)
-            .attr('height', d => barData.height - barData.yScale(d[barData.yKey]))
-            .attr('y', d => barData.yScale(d[barData.yKey]))
-            .attr('fill', () => barData.color(Math.random()));
-
-        // x-axis update
-        const xAxis = d3.select('.x-axis')
-        // TODO: Error if try to animate x-axis
-        // .transition()
-        // .duration(duration)
-            .call(d3.axisBottom(barData.xScale).tickFormat(d => (d.length > 20 ? d.substr(0, 20) + '…': d)));
-
-        // rotate x-axis tick labels
-        xAxis.selectAll('text')
-            .attr('x', 0)
-            .attr('y', 0)
-            .attr('dy', '1em')
-            .attr('dx', '-1em')
-            .attr('transform', 'rotate(-45)')
-            .style('text-anchor', 'end');
-
-        d3.select('.x-axis-label')
-            .attr('opacity', 0)
-            .transition()
-            .duration(duration)
-            .attr('opacity', 1)
-            .text(barData.xAxisLabel);
-
-        // y-axis update
-        d3.select('.y-axis')
-        // TODO: Error if try to animate y-axis
-        // .transition()
-        // .duration(duration)
-            .call(d3.axisLeft(barData.yScale));
-
-        d3.select('.y-axis-label')
-            .attr('opacity', 0)
-            .transition()
-            .duration(duration)
-            .attr('opacity', 1)
-            .text(barData.yAxisLabel);
     },
 
     render() {
