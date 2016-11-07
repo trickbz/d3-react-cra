@@ -106,7 +106,8 @@ const BarChart = React.createClass({
             .transition()
             .duration(duration)
             .style('opacity', 0)
-            .attr('height', 0)
+            .attr('height', barData.height - barData.yScale(0))
+            .attr('y', d => barData.yScale(0))
             .remove();
 
         bars
@@ -159,6 +160,9 @@ const BarChart = React.createClass({
 
         // x axis label
         svg.select('.x-axis-label')
+            .text('')
+            .transition()
+            .duration(duration)
             .text(barData.xAxisLabel);
 
         // y axis
@@ -169,7 +173,7 @@ const BarChart = React.createClass({
         svg.select('.y-axis-label')
             .text(barData.yAxisLabel);
 
-        this.animateFauxDOM(1000);
+        this.animateFauxDOM(duration);
     },
 
     render() {
