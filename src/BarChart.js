@@ -96,6 +96,7 @@ const BarChart = React.createClass({
     update(config, svg) {
         var barData = this.getDataFromConfig(config);
         const duration = 1000;
+        const tooltip = d3.select('.bar-chart-tooltip');
 
         const bars = svg.selectAll('rect')
             .data(barData.data);
@@ -136,12 +137,17 @@ const BarChart = React.createClass({
             .attr('y', d => barData.yScale(d[barData.yKey]))
             .style('opacity', 1);
 
-        const tooltip = d3.select('.bar-chart-tooltip');
+        const barTooltipText = d => {
+            return `<strong>${barData.xAxisLabel}:</strong> ${d[barData.xKey]}<br /><strong>${barData.yAxisLabel}:</strong> ${d[barData.yKey]}`;
+        };
+        // adding tooltips to bars
         svg.selectAll('.bar')
-            .on("mouseover", d => tooltip.style("visibility", "visible").text(d[barData.yKey]))
+            .on("mouseover", d => tooltip.style("visibility", "visible").html(barTooltipText(d)))
             .on("mousemove", d => {
-                tooltip.style("top",
-                    (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px").text(d[barData.yKey])
+                tooltip
+                    .style("top", (d3.event.pageY-10)+"px")
+                    .style("left",(d3.event.pageX+10)+"px")
+                    .html(barTooltipText(d));
             })
             .on("mouseout", () => tooltip.style("visibility", "hidden"));
 
@@ -156,13 +162,22 @@ const BarChart = React.createClass({
             .attr('dy', '1em')
             .attr('dx', '-1em')
             .attr('transform', 'rotate(-45)')
-            .style('text-anchor', 'end');
+            .style('text-anchor', 'end')
+            .on("mouseover", d => tooltip.style("visibility", "visible").text(d))
+            .on("mousemove", d => {
+                tooltip
+                    .style("top", (d3.event.pageY-10)+"px")
+                    .style("left",(d3.event.pageX+10)+"px")
+                    .text(d)
+            })
+            .on("mouseout", () => tooltip.style("visibility", "hidden"));
 
         // x axis label
         svg.select('.x-axis-label')
-            .text('')
+            .style('opacity', 0)
             .transition()
             .duration(duration)
+            .style('opacity', 1)
             .text(barData.xAxisLabel);
 
         // y axis
@@ -171,6 +186,10 @@ const BarChart = React.createClass({
 
         // y axis label
         svg.select('.y-axis-label')
+            .style('opacity', 0)
+            .transition()
+            .duration(duration)
+            .style('opacity', 1)
             .text(barData.yAxisLabel);
 
         this.animateFauxDOM(duration);
