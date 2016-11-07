@@ -182,7 +182,7 @@ const BarChart = React.createClass({
 
         // y axis
         svg.select('.y-axis')
-            .call(d3.axisLeft(barData.yScale));
+            .call(d3.axisLeft(barData.yScale).tickSizeInner(-barData.width).tickSizeOuter(0));
 
         // y axis label
         svg.select('.y-axis-label')

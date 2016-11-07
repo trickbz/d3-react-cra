@@ -12,3 +12,7 @@ svg {
     padding: 3px;
     background-color: white;
 }
+
+.tick line {
+    opacity: 0.2;
+}
